@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-
+use App\Jobs\SendMessege;
 class MonitorController extends Controller
 {
     private function getData()
@@ -30,17 +30,21 @@ class MonitorController extends Controller
         return redirect('/');
     }
 
-    public function checkSite(mailController $mail)
+    public function checkSite(mailController $mail)  //Основной метод. Внедряем объект класса отвечающего за отправку Email
     {
         $data = $this->getData();
         foreach ($data as $elem)
         {
+
             $check = $this->check($elem->URL);
             $name = $elem->name;
             $url = $elem->URL;
-            if ($check=='FAIL')
+            $text = '';
+            if ($check=='FAIL') //Если сайт недоступен обращаемся к методу SendMessege для постановки в очеердь отправки сообщения
             {
-                $mail->send($name);
+                $text .= $name.', '; //формируем текст со списком недоступных сайтов
+                $send = new SendMessege($mail, $text);
+                $send->handle();
             }
             $arr[] = [
                 'name' => $name,
@@ -53,7 +57,7 @@ class MonitorController extends Controller
 
     private function check($url)
     {
-        /*if(!filter_var($url, FILTER_VALIDATE_URL)){
+        if(!filter_var($url, FILTER_VALIDATE_URL)){    //честно стыренная (и проверенная на хостинге)с интерне функция по проверки доступности сайтов
             return false;
         }
 
@@ -70,9 +74,9 @@ class MonitorController extends Controller
         $response = curl_exec($curlInit);
 
         // закрываем CURL
-        curl_close($curlInit);*/
+        curl_close($curlInit);
 
-        return 'OK'; //$response ? 'OK' : 'FAIL';
+        return $response ? 'OK' : 'FAIL';
     }
 
 }

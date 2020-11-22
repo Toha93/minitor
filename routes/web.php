@@ -17,6 +17,4 @@ Route::get('/', 'App\Http\Controllers\MonitorController@checkSite');
 Route::get('/add', 'App\Http\Controllers\MonitorController@add');
 Route::post('/add', 'App\Http\Controllers\MonitorController@add');
 Route::get('/del/{name}', 'App\Http\Controllers\MonitorController@del');
-Route::get('/send','App\Http\Controllers\mailController@send');
-Route::get('/test','App\Http\Controllers\MonitorController@test1');
 
